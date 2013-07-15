@@ -1,0 +1,22 @@
+{
+  "name": "DumDum",
+  "version": "0.0.1",
+  "description": "A simple, extendable random data generator.",
+  "main": "dumdum.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": "",
+  "keywords": [
+    "random",
+    "data",
+    "lipsum"
+  ],
+  "author": "Richard Key",
+  "license": "BSD",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-uglify": "~0.2.2"
+  }
+}

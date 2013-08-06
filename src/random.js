@@ -46,9 +46,16 @@
         return '';
       }
 
-      var str = '';
+      var str = '', octet;
       for(var h = 0; h < length; h++) {
-        str += random.int(255).toString(16).toUpperCase();
+        octet = random.int(255).toString(16).toUpperCase();
+
+        //Leading zero, hex octet is "00" to "FF"
+        if(octet.length === 1) {
+          octet = '0' + octet;
+        }
+
+        str += octet;
       }
 
       return str;

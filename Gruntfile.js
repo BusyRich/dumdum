@@ -1,40 +1,30 @@
 var path = require('path');
 
 module.exports = function(grunt) {
-  var cHelpers = 'src/helpers.compiled.js';
+  var helpersFull = 'src/helpers.full.js';
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
   var files = {
     //All helpers
     full: [
-      'src/pre.js',
-      'src/static.js',
-      'src/random.js',
-      cHelpers,
       'src/core.js',
-      'src/post.js'
+      'src/helpers.full.js'
     ],
 
     //Only the core random generators
     core: [
-      'src/pre.js',
-      'src/random.js',
-      'src/helpers.js',
-      'src/core.js',
-      'src/post.js'
+      'src/core.js'
     ]
   };
 
   // Project configuration
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    helpers: {
-      all: {
-        base: 'src/helpers.js',
-        files: ['src/helpers/*.js'],
-        dest: cHelpers
-      }
-    },
     concat: {
+      helpers: {
+        src: ['src/helpers/unordered/*.js', 'src/helpers/web.js'],
+        dest: helpersFull
+      },
       clientFull: {
         src: files.full,
         dest: 'build/client/<%= pkg.name.toLowerCase() %>.<%= pkg.version %>.js',
@@ -68,44 +58,24 @@ module.exports = function(grunt) {
         files: [{
           expand: true,
           flatten: true,
-          src: ['src/node/*','!src/node/node.post.js'], 
+          src: ['src/node/*','!src/node/node.post.js'],
           dest: 'build/node/'
         }]
       }
+    },
+    watch: {
+      scripts: {
+        files: ['./src/**', 'Gruntfile.js'],
+        tasks: ['default']
+      },
     }
   });
 
-  grunt.registerTask('default', ['helpers:all','concat','uglify','copy']);
+  grunt.registerTask('default', ['concat','uglify','copy']);
+  grunt.registerTask('dev', 'watch');
 
   //Grunt base tasks
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-copy');
-
-  grunt.registerMultiTask('helpers', 'Compile all the helpers into one file', function() {
-    var files = grunt.file.expand(this.data.files);
-
-    var name, current, helpers = '';
-    for(var f = 0; f < files.length; f++) {
-      name = path.basename(files[f]).replace(/\..*?$/, '');
-      current = grunt.file.read(files[f], {encoding:'utf8'})
-        .replace(/\n/g, '\n    '); //Pretty spacing
-
-      helpers += '\n    ' + name + ': ' + current;
-
-      //Comma every element but the last one
-      if(f < files.length - 1) {
-        helpers += ',';
-      }
-    }
-
-    var base = grunt.file.read(this.data.base, {encoding:'utf8'})
-      .replace(
-        /\n*\s*\};\s*\n*\s*/g, //Aggressive spacing and closing bracket removal 
-        ','
-      );
-  
-    //Write the compiled file
-    grunt.file.write(this.data.dest, base + helpers + '\n  };'); 
-  });
 };

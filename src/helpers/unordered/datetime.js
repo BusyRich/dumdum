@@ -1,18 +1,13 @@
-dumdum.addHelper('datetime', function(offset) {
-  var interval = 0;
+dumdum.addHelper('datetime', function(maxOffset, start) {
+  start = start || new Date();
 
-  if(typeof offset === 'number') {
-    interval = offset;
+  var matches = maxOffset.match(offsetFormatRegex);
+  if(matches && matches.length >= 3 && intervals.hasOwnProperty(matches[2])) {
+    return new Date(start.getTime() + 
+      core.integer(intervals[matches[2]] * parseInt(matches[1])));
   }
 
-  if(typeof offset === 'string') {
-    var matches = offset.match(/^([0-9]+)([smhdwMy]{1})$/);
-    if(matches && matches.length >= 3 && intervals.hasOwnProperty(matches[2])) {
-      interval = intervals[matches[2]] * parseInt(matches[1]);
-    }
-  }
-
-  return new Date(Date.now() + interval);
+  return new Date();  
 },{
   intervals: {
     s: 1000,
@@ -22,5 +17,6 @@ dumdum.addHelper('datetime', function(offset) {
     w: 7 * 24 * 60 * 60 * 1000,
     M: 4 * 7 * 24 * 60 * 60 * 1000,
     y: 52 * 7 * 24 * 60 * 60 * 1000
-  } 
+  },
+  offsetFormatRegex: /^([0-9]+)([smhdwMy]{1})$/
 });

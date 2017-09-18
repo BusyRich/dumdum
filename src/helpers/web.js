@@ -1,7 +1,7 @@
 dumdum.addHelper('web', [{
     name: 'website',
     fn: function(domainOnly) {
-      var domain = core.string('CVCVCCVCV.') + core.choose(tlds);
+      var domain = core.string('$C$V$C$V$C$C$V$C$V.') + core.choose(tlds);
 
       if(!domainOnly) {
         domain = 'http://www.' + domain;

@@ -1,7 +1,7 @@
 dumdum.addHelper('address', [{ 
     name: 'street',
     fn: function() {
-      return core.string('#### cvc') + ' ' + core.choose(streetTypes);
+      return core.string('#### $c$v$c') + ' ' + core.choose(streetTypes);
     }
   }, {
     name: 'state',
@@ -26,7 +26,7 @@ dumdum.addHelper('address', [{
     fn: function() {
       return {
         address: helpers.address.street(),
-        city: core.string('Cvcvv'),
+        city: core.string('$C$v$c$v'),
         state: helpers.address.state(),
         zip: helpers.address.zip(true)
       };

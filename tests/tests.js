@@ -18,7 +18,7 @@ console.log(dumdum(10, function() {
     // anInt: integer(100),
     // aFloat: float(2,3),
     // aBoolean: boolean(),
-    // aString: string('CvC ## AaaA'),
+    //aString: string('$-\\$c-$c$C-#####-\\$[rqwegba]-#-\\$\\$c\\#-$[23ewf42]24$[!@$%^&*]-$V')
     // myGenny: helpers.myGenny(80),
     // aHex: helpers.hex(6, true),
     // aBinary: helpers.binary(' '),
@@ -26,7 +26,7 @@ console.log(dumdum(10, function() {
     // aCreditCard: helpers.creditCard('+')
     // aDatetime: helpers.datetime('5y')
     // aIpsum: helpers.ipsum()
-    // anAddress: helpers.address.full()
-    anEmail: helpers.web.email()
+    anAddress: helpers.address.full()
+    // anEmail: helpers.web.email()
   };
 }));

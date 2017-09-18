@@ -82,37 +82,81 @@ var dumdum = (function() {
     return array[core.integer(array.length - 1)];
   };
 
-  var vowels = ['a','e','i','o','u','y'];
-  var consonants = ['b','c','d','f','g','h','j','k','l',
-    'm','n','p','q','r','s','t','v','w','x','y','z'];
+  var vowels = ['y','a','e','i','o','u'];
+      consonants = ['b','c','d','f','g','h','j','k','l',
+        'm','n','p','q','r','s','t','v','w','x','y','z'],
+      alphabet = consonants.concat(vowels.slice(1)),
+      precedeRegex = '(.?|^)',
+      insideBrackets = '\\[[^\\]]+\\](\\d+|\\\\\\d+)?'
+      insideBracketsRegex = new RegExp(insideBrackets),
+      mainRegex = new  RegExp(precedeRegex +
+        '\\$([CcVv]|' + insideBrackets + ')?', 'g'),
+      numberRegx = new RegExp(precedeRegex + '(#+)', 'g'),
+      hashRegex = /#/g;
 
-  core.string = coreContext.string = function(format) {
-    if(typeof format === 'number') {
-      format = (new Array(format + 1)).join('a');
-    }
-
-    if(typeof format !== 'string') {
+  core.string = coreContext.string = function(input) {
+    if(typeof input !== 'string') {
       return '';
     }
 
-    format = format.toLowerCase().split('');
-
-    var str = '';
-    for(var ch = 0; ch < format.length; ch++) {
-      if(format[ch] === 'v') {
-        str += core.choose(vowels);
-      } else if(format[ch] === 'c') {
-        str += core.choose(consonants);
-      } else if(format[ch] === 'a') {
-        str += String.fromCharCode(core.integer(97, 122));
-      } else if(format[ch] === '#') {
-        str += core.integer(9);
-      } else {
-        str += format[ch];
+    return input.replace(mainRegex, function(match, inFront, type, its) {
+      if(inFront === '\\') {
+        return match.substring(1); 
       }
-    }
+      
+      var value = inFront;
+      
+      switch(type) {
+        case 'C':
+          value += core.choose(consonants).toUpperCase();
+          break;
+        case 'c':
+          value += core.choose(consonants); 
+          break;
+        case 'V':
+          value += core.choose(vowels).toUpperCase();
+          break;
+        case 'v':
+          value += core.choose(vowels);
+          break;
+        default:
+          if(insideBracketsRegex.test(type)) {
+            its = its || '1';
 
-    return str;
+            var choices = type
+              .substring(1, type.length - 1 - its.toString().length)
+              .split('');
+
+            if(its.indexOf('\\') === 0) {
+              value += core.choose(choices) + its.substring(1);
+            } else {
+              for(var c = 0; c < parseInt(its); c++) {
+                value += core.choose(choices);
+              }
+            }        
+          } else {
+            value += core.choose(alphabet);
+          }
+          break;
+      }
+      
+      return value;
+    }.bind(this)).replace(numberRegx, function(match, inFront, hashes) {
+      if(inFront === '\\') {
+        return match.substring(1);
+      }
+      
+      //turns the hashes string into a max value passed to the generator
+      var value = core.integer(parseInt(hashes.replace(hashRegex,'9')))
+        .toString();
+
+      //the number will be 0 padded based on the hashes length and 
+      //the character length of the value generated. The array join
+      //method is used for conciseness.
+      return inFront + 
+        Array((hashes.length - value.length) + 1).join('0')
+        + value;
+    }.bind(this));
   };
 
   core.helpers = {};

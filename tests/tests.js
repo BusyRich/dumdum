@@ -24,9 +24,10 @@ console.log(dumdum(10, function() {
     // aBinary: helpers.binary(' '),
     // aColor: helpers.color.rgb(),
     // aCreditCard: helpers.creditCard('+')
-     aDatetime: helpers.datetime('3y', new Date(1990, 1, 1))
+    // aDatetime: helpers.datetime('3y', new Date(1990, 1, 1))
     // aIpsum: helpers.ipsum()
     // anAddress: helpers.address.full()
     // anEmail: helpers.web.email()
+    aUUID: helpers.uuid()
   };
 }));

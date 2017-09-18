@@ -22,7 +22,9 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     concat: {
       helpers: {
-        src: ['src/helpers/unordered/*.js', 'src/helpers/web.js'],
+        src: ['src/helpers/unordered/*.js',
+          'src/helpers/uuid.js',
+          'src/helpers/web.js'],
         dest: helpersFull
       },
       clientFull: {

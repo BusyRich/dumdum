@@ -1,5 +1,6 @@
 /***
  * DumDumJS - A Simple Dummy Data Generator
+ * Version: <%= pkg.version %>
  */
 var dumdum = (function() {
   //The context that generator functions are bound to.

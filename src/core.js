@@ -1,8 +1,4 @@
 var dumdum = (function() {
-  //----------------------------
-  //Core functionality of DumDum
-  //----------------------------
-
   //The context that generator functions are bound to.
   var coreContext = {};
 
@@ -99,64 +95,70 @@ var dumdum = (function() {
       return '';
     }
 
-    return input.replace(mainRegex, function(match, inFront, type, its) {
-      if(inFront === '\\') {
-        return match.substring(1); 
-      }
-      
-      var value = inFront;
-      
-      switch(type) {
-        case 'C':
-          value += core.choose(consonants).toUpperCase();
-          break;
-        case 'c':
-          value += core.choose(consonants); 
-          break;
-        case 'V':
-          value += core.choose(vowels).toUpperCase();
-          break;
-        case 'v':
-          value += core.choose(vowels);
-          break;
-        default:
-          if(insideBracketsRegex.test(type)) {
-            its = its || '1';
+    return input.replace(mainRegex, 
+      function(match, inFront, type, its, offset) {
+        if(inFront === '\\') {
+          return match.substring(1); 
+        }
 
-            var choices = type
-              .substring(1, type.length - 1 - its.toString().length)
-              .split('');
+        var value = inFront;
 
-            if(its.indexOf('\\') === 0) {
-              value += core.choose(choices) + its.substring(1);
+        switch(type) {
+          case 'C':
+            value += core.choose(consonants).toUpperCase();
+            break;
+          case 'c':
+            value += core.choose(consonants); 
+            break;
+          case 'V':
+            value += core.choose(vowels).toUpperCase();
+            break;
+          case 'v':
+            value += core.choose(vowels);
+            break;
+          default:
+            if(insideBracketsRegex.test(type)) {
+              its = its || '1';
+
+              var choices = type
+                .substring(1, type.length - 1 - its.toString().length)
+                .split('');
+
+              if(its.indexOf('\\') === 0) {
+                value += core.choose(choices) + its.substring(1);
+              } else {
+                for(var c = 0; c < parseInt(its); c++) {
+                  value += core.choose(choices);
+                }
+              }        
             } else {
-              for(var c = 0; c < parseInt(its); c++) {
-                value += core.choose(choices);
-              }
-            }        
-          } else {
-            value += core.choose(alphabet);
-          }
-          break;
-      }
-      
-      return value;
-    }.bind(this)).replace(numberRegx, function(match, inFront, hashes) {
-      if(inFront === '\\') {
-        return match.substring(1);
-      }
-      
-      //turns the hashes string into a max value passed to the generator
-      var value = core.integer(parseInt(hashes.replace(hashRegex,'9')))
-        .toString();
+              value += core.choose(alphabet);
 
-      //the number will be 0 padded based on the hashes length and 
-      //the character length of the value generated. The array join
-      //method is used for conciseness.
-      return inFront + 
-        Array((hashes.length - value.length) + 1).join('0')
-        + value;
-    }.bind(this));
+              if(inFront === '$' && 
+                (offset === 0 || input[offset - 1] !== '\\')) {
+                  value = core.choose(alphabet) + value[1];
+              }
+            }
+            break;
+        }
+        
+        return value;
+      }.bind(this)).replace(numberRegx, function(match, inFront, hashes) {
+        if(inFront === '\\') {
+          return match.substring(1);
+        }
+        
+        //turns the hashes string into a max value passed to the generator
+        var value = core.integer(parseInt(hashes.replace(hashRegex,'9')))
+          .toString();
+
+        //the number will be 0 padded based on the hashes length and 
+        //the character length of the value generated. The array join
+        //method is used for conciseness.
+        return inFront + 
+          Array((hashes.length - value.length) + 1).join('0')
+          + value;
+      }.bind(this));
   };
 
   core.helpers = {};

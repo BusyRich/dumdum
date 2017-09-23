@@ -9,10 +9,8 @@ dumdum.addHelper('binary', function(bits) {
   }
 
   var value = '';
-  if(utility.type(bits, 'number')) {
-    for(var b = 0; b < bits; b++) {
-      value += core.integer();
-    }
+  for(var b = 0; b < bits; b++) {
+    value += core.integer();
   }
 
   return value;

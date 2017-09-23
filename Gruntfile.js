@@ -3,6 +3,7 @@ var path = require('path');
 module.exports = function(grunt) {
   var helpersFull = 'src/helpers.full.js';
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
 
   var files = {
     //All helpers
@@ -21,10 +22,14 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     concat: {
+      options: {
+        process: true
+      },
       helpers: {
         src: ['src/helpers/unordered/*.js',
           'src/helpers/uuid.js',
-          'src/helpers/web.js'],
+          'src/helpers/web.js',
+          'src/helpers/personal.js'],
         dest: helpersFull
       },
       clientFull: {
@@ -41,10 +46,12 @@ module.exports = function(grunt) {
       }
     },
     uglify: {
-      options: {
-        banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
-      },
       client: {
+        options: {
+          output: {
+            comments: /^\*{2}/
+          }
+        },
         files: {
           'build/client/<%= pkg.name.toLowerCase() %>.<%= pkg.version %>.min.js':
             'build/client/<%= pkg.name.toLowerCase() %>.<%= pkg.version %>.js',

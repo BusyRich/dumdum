@@ -193,22 +193,31 @@ var dumdum = (function() {
         }
         
         return value;
-      }.bind(this)).replace(numberRegx, function(match, inFront, hashes) {
-        if(inFront === '\\') {
-          return match.substring(1);
-        }
-        
-        //Turns the hashes string into a max value passed to the generator
-        //Ex: #### becomes 9999 instead of four seperate 0-9 values
-        var value = core.integer(parseInt(hashes.replace(hashRegex,'9')))
-          .toString();
+      }.bind(this)).replace(numberRegx, 
+        function(match, inFront, hashes, offset) {
+          if(inFront === '\\') {
+            return match.substring(1);
+          }
 
-        //The number will be 0 padded based on the hashes length and 
-        //the character length of the value generated. The array join
-        //method is used for conciseness.
-        return inFront + 
-          Array((hashes.length - value.length) + 1).join('0')
-          + value;
+          //This allows the preceding character to be a # and adds it to
+          //the #s to use, but only if not preceded itself by a \.
+          if(inFront === '#' && 
+            (offset === 0 || input[offset - 1] !== '\\')) {
+              hashes = match;
+              inFront = '';
+          }
+          
+          //Turns the hashes string into a max value passed to the generator
+          //Ex: #### becomes 9999 instead of four seperate 0-9 values
+          var value = core.integer(parseInt(hashes.replace(hashRegex,'9')))
+            .toString();
+
+          //The number will be 0 padded based on the hashes length and 
+          //the character length of the value generated. The array join
+          //method is used for conciseness.
+          return inFront + 
+            Array((hashes.length - value.length) + 1).join('0') +
+            value;
       }.bind(this));
   };
 

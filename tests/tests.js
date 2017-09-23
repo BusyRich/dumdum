@@ -16,18 +16,18 @@ console.log(dumdum(10, function() {
   return {
     // aRandom: random(),
     // anInt: integer(100),
-    // aFloat: float(2,3),
+    // aFloat: float(3),
     // aBoolean: boolean(),
-    //aString: string('$-\\$c-$c$C-#####-\\$[rqwegba]-#-\\$\\$c\\#-$[23ewf42]24$[!@$%^&*]-$V')
+    // aString: string('$$-\\$c-$c$C-#####-\\$[rqwegba]-#-\\$\\$$$$\\$c\\#-$[23ewf42]6$[!@$%^&*]-$V')
     // myGenny: helpers.myGenny(80),
     // aHex: helpers.hex(6, true),
     // aBinary: helpers.binary(' '),
     // aColor: helpers.color.rgb(),
-    // aCreditCard: helpers.creditCard('+')
+    // aCreditCard: helpers.personal.creditCard()
     // aDatetime: helpers.datetime('3y', new Date(1990, 1, 1))
     // aIpsum: helpers.ipsum()
-    // anAddress: helpers.address.full()
-    // anEmail: helpers.web.email()
-    aUUID: helpers.uuid()
+    // anAddress: helpers.personal.address()
+    // anEmail: helpers.personal.email()
+    // aUUID: helpers.uuid()
   };
 }));

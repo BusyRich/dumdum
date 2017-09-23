@@ -1,15 +1,23 @@
-dumdum.addHelper('address', [{ 
-    name: 'street',
+dumdum.addHelper('personal', [{
+    name: 'email',
     fn: function() {
-      return core.string('#### $c$v$c') + ' ' + core.choose(streetTypes);
+      return helpers.color.name() +
+        core.choose(states) +
+        core.integer(100,999) +
+        '@' + helpers.web.website(true);
+    } 
+  },{
+    name: 'creditCard',
+    fn: function(separator) {
+      return [
+        core.string('####'),
+        core.string('####'),
+        core.string('####'),
+        core.string('####')
+      ].join(separator || '-');
     }
-  }, {
-    name: 'state',
-    fn: function() {
-      return core.choose(states);
-    }
-  }, {
-    name: 'zip',
+  },{
+    name: 'address',
     fn: function(plus4) {
       var zip = core.integer(10000,99999);
 
@@ -19,16 +27,11 @@ dumdum.addHelper('address', [{
         zip += '-' + plusCode;
       }
 
-      return zip;
-    }
-  }, {
-    name: 'full',
-    fn: function() {
       return {
-        address: helpers.address.street(),
+        address: core.string('#### $c$v$c ') + core.choose(streetTypes),
         city: core.string('$C$v$c$v'),
-        state: helpers.address.state(),
-        zip: helpers.address.zip(true)
+        state: core.choose(states),
+        zip: zip
       };
     }
   }

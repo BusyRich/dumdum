@@ -1,22 +1,19 @@
+/*
+ * Generates a given number of bits.
+ * @param {number} bits - The number of bits to generate.
+ * @returns {string} The bits generated.
+ */
 dumdum.addHelper('binary', function(bits) {
-  if(typeof bits !== 'number' && typeof bits !== 'string') {
+  if(!utility.type(bits, 'number')) {
     return '';
   }
 
   var value = '';
-  if(typeof bits === 'number') {
+  if(utility.type(bits, 'number')) {
     for(var b = 0; b < bits; b++) {
       value += core.integer();
     }
-  } else {
-    for(var c = 0; c < bits.length; c++) {
-      value += bits.charCodeAt(c).toString(2);
-    }
-
-    value = pad.substring(value.length) + value;
   }
 
   return value;
-}, {
-  pad: '00000000'
 });

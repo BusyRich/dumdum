@@ -1,10 +1,12 @@
 /***
- * DumDumJS - A Simple Dummy Data Generator
+ * DumDumJS - Dummy Data Made Simple
  * Version: <%= pkg.version %>
  */
 var dumdum = (function() {
   //The context that generator functions are bound to.
-  var coreContext = {};
+  var coreContext = {
+    utility: {}
+  };
 
   /*
    * Core generator. Takes a number of iterations and
@@ -39,6 +41,29 @@ var dumdum = (function() {
     })(fn);
   };
 
+  var typeRegex = /\[\w+ (\w+)\]/g
+  /*
+   * A typing utility that uses Object.prototype.toString(),
+   * based on the jQuery $.type() function. Can either return 
+   * the type or test against a target type.
+   * @param {Object} obj - The object to type check.
+   * @param {=string} type - The type to check against. If this
+   * is not provided, the type will be returned.
+   * @returns {(string|boolean)} The type or a boolean that
+   * indicates is the obj is of the type given.
+   */
+  core.type = coreContext.utility.type = function(obj, targetType) {
+    var type = Object.prototype.toString.call(obj)
+      .replace(typeRegex, '$1')
+      .toLowerCase();
+
+    if(targetType) {
+      return type === targetType;
+    }
+
+    return type;
+  };
+
   /*
    * The core random number generator. Provided
    * as a public, overridable function so it can
@@ -61,12 +86,12 @@ var dumdum = (function() {
    */
   core.float = coreContext.float = function(minMax, max) {
     //Between 0 and 1
-    if(typeof minMax !== 'number') {
+    if(!core.type(minMax, 'number')) {
       return core.random();
     }
     
     //Between 0 and max
-    if(typeof max !== 'number') {
+    if(!core.type(max, 'number')) {
       return core.random() * (minMax);
     }
     
@@ -85,12 +110,12 @@ var dumdum = (function() {
    */
   core.integer = coreContext.integer = function(minMax, max) {
     //0 or 1
-    if(typeof minMax !== 'number') {
+    if(!core.type(minMax, 'number')) {
       return Math.round(core.random());
     }
     
     //Little bit of tweaking for ranges
-    if(typeof max !== 'number') {
+    if(!core.type(max, 'number')) {
       minMax += 1;
     } else {
       max += 1;
@@ -113,7 +138,7 @@ var dumdum = (function() {
    * @returns {*} The array element chosen.
    */
   core.choose = coreContext.choose = function(array) {
-    if(array instanceof Array === false) {
+    if(!core.type(array, 'array')) {
       return '';
     }
 
@@ -139,7 +164,7 @@ var dumdum = (function() {
    * @returns {string}
    */
   core.string = coreContext.string = function(input) {
-    if(typeof input !== 'string') {
+    if(core.type(input, 'string')) {
       return '';
     }
 
@@ -238,16 +263,16 @@ var dumdum = (function() {
    * using it to extend existing libraries.
    */
   core.addHelper = function(name, fn, additionalContext, rootName) {
-    if(typeof fn !== 'function') {
-      if(Array.isArray(fn)) {
+    if(!core.type(fn, 'function')) {
+      if(core.type(fn, 'array')) {
         for(var f = 0; f < fn.length; f++) {
-          if(fn[f].name && typeof fn[f].fn === 'function') {
+          if(fn[f].name && core.type(fn[f].fn, 'function')) {
             core.addHelper(fn[f].name, fn[f].fn, additionalContext, name);
           }
         }
       } else {
         for(var f in fn) {
-          if(fn.hasOwnProperty(f) && typeof fn[f] === 'function') {
+          if(fn.hasOwnProperty(f) && core.type(fn[f] === 'function')) {
             core.addHelper(f, fn[f], additionalContext, name);
           }
         }

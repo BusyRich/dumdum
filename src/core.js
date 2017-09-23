@@ -134,11 +134,12 @@ var dumdum = (function() {
 
   /*
    * Chooses a random element in an array.
-   * @param {Array} array - The array to choose from.
+   * @param {(string|Array)} array - The array to choose from. Can also be
+   * a string, because after all, its just a character array.
    * @returns {*} The array element chosen.
    */
   core.choose = coreContext.choose = function(array) {
-    if(!core.type(array, 'array')) {
+    if(!core.type(array, 'array') && !core.type(array, 'string')) {
       return '';
     }
 

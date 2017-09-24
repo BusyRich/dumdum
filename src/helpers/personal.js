@@ -3,6 +3,23 @@
  * Generates data such as names, emails, address, etc. 
  */
 dumdum.addHelper('personal', [{
+    name: 'social',
+
+    /*
+     * Generates a social security number.
+     * @param {string} separator - The character
+     * or string to put between the number sets.
+     * Defaults to an empty string.
+     * @returns The generated social.
+     */
+    fn: function(separator) {
+      return [
+        core.string('###'),
+        core.string('##'),
+        core.string('####')
+      ].join(separator || '');
+    }
+  },{
     name: 'email',
 
     /*

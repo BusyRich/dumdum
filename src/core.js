@@ -159,6 +159,107 @@ var dumdum = (function() {
       hashRegex = /#/g;
 
   /*
+   * Internal function used with the main regex to do the
+   * bulk of the work for creating custom strings. This is
+   * the meant to be used with a replace call.
+   * @param {string} match - The full regex match.
+   * @param {string} inFront - The character preceding the $.
+   * @param {string} type - The matching group after the $,
+   * which determines what kind of character(s) to generate.
+   * @param {string} its - The number of characters to generate,
+   * if generating based on a $[] group.
+   * @param {number} offset - The index of the match within the input.
+   * @param {string} input - The original string that was given.
+   */
+  var stringReplace =  function(match, inFront, type, its, offset, input) {
+    if(inFront === '\\') {
+      return match.substring(1); 
+    }
+
+    var value = inFront;
+
+    switch(type) {
+      case 'C':
+        value += core.choose(consonants).toUpperCase();
+        break;
+      case 'c':
+        value += core.choose(consonants); 
+        break;
+      case 'V':
+        value += core.choose(vowels).toUpperCase();
+        break;
+      case 'v':
+        value += core.choose(vowels);
+        break;
+      default:
+        if(insideBracketsRegex.test(type)) {
+          its = its || '1';
+
+          var choices = type
+            .substring(1, type.length - 1 - its.toString().length)
+            .split('');
+
+          if(its.indexOf('\\') === 0) {
+            value += core.choose(choices) + its.substring(1);
+          } else {
+            for(var c = 0; c < parseInt(its); c++) {
+              value += core.choose(choices);
+            }
+          }        
+        } else {
+          value += core.choose(alphabet);
+
+          //This fixes matching $$. Without this logic the 
+          //preceding $ would be preserved and not used to
+          //generate a character
+          if(inFront === '$' && 
+            (offset === 0 || input[offset - 1] !== '\\')) {
+              value = core.choose(alphabet) + value[1];
+          }
+        }
+        break;
+    }
+    
+    return value;
+  }
+
+  /*
+   * Internal function used to generate numbers in the core
+   * string generator. This is meant to be used with a replace
+   * call.
+   * @param {string} match - The full match from the regex.
+   * @param {string} inFront - The character preceding the #s.
+   * @param {string} hashes - The collection of #s matched.
+   * @param {number} offset - The index of the match within the input.
+   * @param {string} input - The original string that was given.
+   */
+  var numberReplace = function(match, inFront, hashes, offset, input) {
+      if(inFront === '\\') {
+        return match.substring(1);
+      }
+
+      //This allows the preceding character to be a # and adds it to
+      //the #s to use, but only if not preceded itself by a \.
+      if(inFront === '#' && 
+        (offset === 0 || input[offset - 1] !== '\\')) {
+          hashes = match;
+          inFront = '';
+      }
+      
+      //Turns the hashes string into a max value passed to the generator
+      //Ex: #### becomes 9999 instead of four seperate 0-9 values
+      var value = core.integer(parseInt(hashes.replace(hashRegex,'9')))
+        .toString();
+
+      //The number will be 0 padded based on the hashes length and 
+      //the character length of the value generated. The array join
+      //method is used for conciseness.
+      return inFront + 
+        Array((hashes.length - value.length) + 1).join('0') +
+        value;
+  }
+
+  /*
    * Generates a random string based on special formatting with
    * the string.
    * @param {string} input - The format string.
@@ -169,83 +270,9 @@ var dumdum = (function() {
       return '';
     }
 
-    return input.replace(mainRegex, 
-      function(match, inFront, type, its, offset) {
-        if(inFront === '\\') {
-          return match.substring(1); 
-        }
-
-        var value = inFront;
-
-        switch(type) {
-          case 'C':
-            value += core.choose(consonants).toUpperCase();
-            break;
-          case 'c':
-            value += core.choose(consonants); 
-            break;
-          case 'V':
-            value += core.choose(vowels).toUpperCase();
-            break;
-          case 'v':
-            value += core.choose(vowels);
-            break;
-          default:
-            if(insideBracketsRegex.test(type)) {
-              its = its || '1';
-
-              var choices = type
-                .substring(1, type.length - 1 - its.toString().length)
-                .split('');
-
-              if(its.indexOf('\\') === 0) {
-                value += core.choose(choices) + its.substring(1);
-              } else {
-                for(var c = 0; c < parseInt(its); c++) {
-                  value += core.choose(choices);
-                }
-              }        
-            } else {
-              value += core.choose(alphabet);
-
-              //This fixes matching $$. Without this logic the 
-              //preceding $ would be preserved and not used to
-              //generate a character
-              if(inFront === '$' && 
-                (offset === 0 || input[offset - 1] !== '\\')) {
-                  value = core.choose(alphabet) + value[1];
-              }
-            }
-            break;
-        }
-        
-        return value;
-      }.bind(this)).replace(numberRegx, 
-        function(match, inFront, hashes, offset) {
-          if(inFront === '\\') {
-            return match.substring(1);
-          }
-
-          //This allows the preceding character to be a # and adds it to
-          //the #s to use, but only if not preceded itself by a \.
-          if(inFront === '#' && 
-            (offset === 0 || input[offset - 1] !== '\\')) {
-              hashes = match;
-              inFront = '';
-          }
-          
-          //Turns the hashes string into a max value passed to the generator
-          //Ex: #### becomes 9999 instead of four seperate 0-9 values
-          var value = core.integer(parseInt(hashes.replace(hashRegex,'9')))
-            .toString();
-
-          //The number will be 0 padded based on the hashes length and 
-          //the character length of the value generated. The array join
-          //method is used for conciseness.
-          return inFront + 
-            Array((hashes.length - value.length) + 1).join('0') +
-            value;
-      }.bind(this));
+    return input
+      .replace(mainRegex, stringReplace)
+      .replace(numberRegx, numberReplace);
   };
 
   core.helpers = {};

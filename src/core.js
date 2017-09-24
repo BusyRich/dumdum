@@ -65,6 +65,15 @@ var dumdum = (function() {
   };
 
   /*
+   * Capitalizes the first letter of a string.
+   * @param {string} str - The string to be capitalized.
+   * @returns {string} The capitalized string.
+   */
+  core.capitalize = coreContext.utility.capitalize = function(str) {
+    return str.substring(0, 1).toUpperCase() + str.substring(1); 
+  };
+
+  /*
    * The core random number generator. Provided
    * as a public, overridable function so it can
    * replaced if desired. Should always return a

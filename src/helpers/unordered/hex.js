@@ -1,5 +1,13 @@
+/*
+ * Generates a collection of hex octets (00-FF).
+ * @param {number} length - The number of octets
+ * to generate.
+ * @param {boolean} uppercase - When true, the octets
+ * will be uppercased.
+ * @returns {string} The octets generated.
+ */
 dumdum.addHelper('hex', function(length, uppercase) {
-  if(typeof length !== 'number') {
+  if(!utility.type(length, 'number')) {
     return '';
   }
 

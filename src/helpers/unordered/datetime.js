@@ -1,5 +1,22 @@
+/*
+ * Generates a date with a random amount of time added, based
+ * on a provided maximum offset.
+ * @param {string} maxOffset - The maximum offset to add to
+ * the date. Uses a special format: #[smhdwMy]. A number followed
+ * by character representing the time interval. Seconds s,
+ * minutes m, hours h, days d, weeks w, months M, or years y.
+ * Ex: 6d will add anything from 0 to 6 days worth of time to
+ * the date.
+ * @param {Date} start - A date object representing where the
+ * range should start. Defaults to "now".
+ * @returns {Date} A date oject that either has a random 
+ * amount of time added or "now" when the format string
+ * cannot be parsed.
+ */
 dumdum.addHelper('datetime', function(maxOffset, start) {
-  start = start || new Date();
+  if(!utility.type(start, 'date')) {
+    start = new Date();
+  }
 
   var matches = maxOffset.match(offsetFormatRegex);
   if(matches && matches.length >= 3 && intervals.hasOwnProperty(matches[2])) {

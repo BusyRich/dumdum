@@ -176,6 +176,8 @@ var dumdum = (function() {
       return match.substring(1); 
     }
 
+    console.log(inFront);
+
     var value = inFront;
 
     switch(type) {
@@ -208,16 +210,17 @@ var dumdum = (function() {
           }        
         } else {
           value += core.choose(alphabet);
-
-          //This fixes matching $$. Without this logic the 
-          //preceding $ would be preserved and not used to
-          //generate a character
-          if(inFront === '$' && 
-            (offset === 0 || input[offset - 1] !== '\\')) {
-              value = core.choose(alphabet) + value[1];
-          }
         }
         break;
+    }
+
+    //This fixes matching $$. Without this logic the 
+    //preceding $ would be preserved and not used to
+    //generate a character
+    if(inFront === '$' && 
+      (offset === 0 || input[offset - 1] !== '\\')) {
+      console.log('$ in front');
+        value = core.choose(alphabet) + value[1];
     }
     
     return value;

@@ -165,7 +165,7 @@ var dumdum = (function() {
    * @returns {string}
    */
   core.string = coreContext.string = function(input) {
-    if(core.type(input, 'string')) {
+    if(!core.type(input, 'string')) {
       return '';
     }
 

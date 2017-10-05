@@ -26,8 +26,12 @@ console.log(dumdum(10, function() {
     // aCreditCard: helpers.personal.creditCard()
     // aDatetime: helpers.datetime('3y', new Date(1990, 1, 1))
     // aIpsum: helpers.ipsum()
-    // anAddress: helpers.personal.address()
+    // anAddress: helpers.personal.address(true)
     // anEmail: helpers.personal.email()
     // aUUID: helpers.uuid()
+    // aName: helpers.personal.name()
+    // aBirthdate: helpers.personal.birthdate(20, 55),
+    // anAge: Math.abs(new Date(Date.now() - birthdate.getTime()).getFullYear() - 1970)
+    aSocial: helpers.personal.social('-')
   };
 }));

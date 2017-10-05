@@ -148,8 +148,13 @@ var dumdum = (function() {
    * @returns {*} The array element chosen.
    */
   core.choose = coreContext.choose = function(array) {
-    if(!core.type(array, 'array') && !core.type(array, 'string')) {
+    if((!core.type(array, 'array') && !core.type(array, 'string'))
+      || array.length === 0) {
       return '';
+    }
+
+    if(array.length === 1) {
+      return array[0];
     }
 
     return array[core.integer(array.length - 1)];
@@ -184,8 +189,6 @@ var dumdum = (function() {
     if(inFront === '\\') {
       return match.substring(1); 
     }
-
-    console.log(inFront);
 
     var value = inFront;
 
@@ -228,7 +231,6 @@ var dumdum = (function() {
     //generate a character
     if(inFront === '$' && 
       (offset === 0 || input[offset - 1] !== '\\')) {
-      console.log('$ in front');
         value = core.choose(alphabet) + value[1];
     }
     

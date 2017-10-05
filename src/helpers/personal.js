@@ -62,20 +62,45 @@ dumdum.addHelper('personal', [{
       return name;
     }
   },{
+    name: 'birthdate',
+
+    /*
+     * Generates random birthdate based on an age range.
+     * @param {number} minAge - The minimum age for the
+     * birthdate to represent. Defaults to 16.
+     * @param {number} maxAge - The maximum age for the
+     * birthdate to represent. Defaults to 65.
+     * @returns {Date} The generated birthdate.
+     */
+    fn: function(minAge, maxAge) {
+      var startDate = new Date();
+      startDate.setFullYear(startDate.getFullYear() - 
+        (core.integer(minAge || 16, maxAge || 65) + 1));
+
+      return helpers.datetime('1y', startDate);
+    }
+  },{
     name: 'social',
 
     /*
-     * Generates a social security number.
+     * Generates a social security number. Format
+     * constraints based on:
+     * en.wikipedia.org/wiki/Social_Security_number#Historical_structure
      * @param {string} separator - The character
      * or string to put between the number sets.
      * Defaults to an empty string.
-     * @returns The generated social.
+     * @returns {string} The generated social.
      */
     fn: function(separator) {
+      var areaNumber;
+      do {
+        areaNumber = core.integer(1, 769);
+      } while(areaNumber > 649 && areaNumber < 700);
+
       return [
-        core.string('###'),
-        core.string('##'),
-        core.string('####')
+        (zeroPad + areaNumber).slice((zeroPad.length - 2) * -1),
+        (zeroPad + core.integer(1,99)).slice((zeroPad.length - 3) * -1),
+        (zeroPad + core.integer(1,9999)).slice((zeroPad.length - 1) * -1)
       ].join(separator || '');
     }
   },{
@@ -125,18 +150,37 @@ dumdum.addHelper('personal', [{
      *   zip }
      */
     fn: function(plus4) {
-      var zip = core.integer(10000,99999);
+      var state = core.choose(Object.keys(states)),
+          zipFormat = core.choose(states[state]),
+          zipFormatType = utility.type(zipFormat),
+          zip;
+
+      console.log(zipFormat);
+
+      switch(zipFormatType) {
+        case 'array':
+          zip = core.integer(zipFormat[0], zipFormat[1]).toString();
+          break;
+        case 'string':
+          zip = core.string(zipFormat);
+          break;
+        case 'number':
+          zip = zipFormat.toString();
+          break;
+      }
+
+      zip = (zeroPad + zip).slice(zeroPad.length * -1);
 
       if(plus4) {
         var plusCode = core.integer(9999);
-        plusCode = zip4Pad.slice(plusCode) + plusCode;
+        plusCode = (zeroPad + plusCode).slice((zeroPad.length - 1) * -1);
         zip += '-' + plusCode;
       }
 
       return {
         address: core.string('#### $c$v$c ') + core.choose(streetTypes),
-        city: core.string('$C$v$c$v'),
-        state: core.choose(states),
+        city: (state === 'DC' ? 'Washington' : core.string('$C$v$c$v')),
+        state: state,
         zip: zip
       };
     }
@@ -172,17 +216,66 @@ dumdum.addHelper('personal', [{
     'diana','abigail','jane','natalie','lori','tiffany','alexis','kayla'],
   lastNameEnds: ['key','wood','son','smith','fan','beard','fish','man',
     'hand','night','way','art','door','face','leg','war','sword','stone',
-    'bridge','corn','train','kilt'],
+    'bridge','corn','train','kilt', 'worth'],
   lastNameStarts: ['glad','mad','broom','zoom','trans','moon','glow','awe',
-    'fran'],
+    'fran', 'wool'],
   streetTypes: ['ave','blvd','cir','dr','hwy','jct',
     'loop','pike','rd','st','vis','way'],
-  states: [
-    'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA',
-    'HI','ID','IL','IN','IA','KS','KY','LA','ME','MD',
-    'MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
-    'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC',
-    'SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'
-  ],
-  zip4Pad: '0000'
+  //Zip ranges based on
+  //https://www.irs.gov/pub/irs-utl/zip%20code%20and%20state%20abbreviations.pdf
+  //Not meant to be perfect but rather a close range of zips per state
+  states: {
+    AL: [[35000,35299],[35400,36999]],
+    AK: [[99500,99999]],
+    AZ: [[85000,85399],[85500,85799],[85900,86099],[86300,86599]],
+    AR: [[71600,72999]],
+    CA: [[90000,90899],[91000,92899],[93000,96199]],
+    CO: [[80000,81699]],
+    CT: [[6000,6389],[6391,6999]],
+    DE: [[19700,19999]],
+    DC: ['200##',[20200,20587],'569##',[20589,20597],20599],
+    FL: ['339##','341##','342##','344##','346##','347##','349##'],
+    GA: [[30000,31999],[39800,39999]],
+    HI: [[96701,96798],'968##'],
+    ID: [[83200,83413],[83415,83899]],
+    IL: [[60000,62099],[62200,62999]],
+    IN: [[46000,47999]],
+    IA: [[50000,51699],[52000,52899]],
+    KS: [[66000,66299],[66400,67999]],
+    KY: [[40000,41899],[42000,42799]],
+    LA: [[70000,70199],[70300,70899],[71000,71499]],
+    ME: [[3900,4999]],
+    MD: [20588,[20600,21299],[21400,21999]],
+    MA: [[1000,2799],'055##'],
+    MI: [[48000,49999]],
+    MN: [[55000,55199],[55300,56799]],
+    MS: [[38600,39799]],
+    MO: [[63000,63199],[63300,64199],[64400,65899]],
+    MT: [[59000,59999]],
+    NE: [[68000,68199],[68300,69399]],
+    NV: [[88900,89199],[89300,89599],[89700,89899]],
+    NH: [[3000,3899]],
+    NJ: [[7000,8999]],
+    NM: [[87000,87199],[87300,88499]],
+    NY: ['005##',6390,[10000,14999]],
+    NC: [[27000,28999]],
+    ND: [[58000,58899]],
+    OH: [[43000,45999]],
+    OK: [[73000,73199],[73400,73959],[73961,74199],[74300,74999]],
+    OR: [[97000,97999]],
+    PA: [[15000,19699]],
+    RI: ['028##','029##'],
+    SC: [[29000,29999]],
+    SD: [[57000,57799]],
+    TN: [[37000,38599]],
+    TX: ['733##',73960,[75000,77099],[77200,79999],'885##'],
+    UT: [[84000,84799]],
+    VT: [[5000,5499],[5600,5999]],
+    VA: ['201##',20598,[22000,24699]],
+    WA: [[98000,98699],[98800,99499]],
+    WV: [[24700,26899]],
+    WI: [[53000,53299],[53400,53599],[53700,54999]],
+    WY: [[82000,83199],83414]
+  },
+  zeroPad: '00000'
 });
